@@ -25,12 +25,7 @@ import json
 import logging
 import logging.handlers
 import os
-
-try:
-    import cPickle as pickle
-except:
-    import pickle
-
+import pickle
 import plistlib
 import re
 import shutil
@@ -693,7 +688,6 @@ class PickleSerializer(BaseSerializer):
 
 # Set up default manager and register built-in serializers
 manager = SerializerManager()
-manager.register("cpickle", PickleSerializer)
 manager.register("pickle", PickleSerializer)
 manager.register("json", JSONSerializer)
 
@@ -1605,6 +1599,8 @@ class Workflow(object):
                 "to load this data.".format(serializer_name)
             )
 
+        self.logger.debug("data `%s` stored as `%s`", name, serializer_name)
+
         filename = "{0}.{1}".format(name, serializer_name)
         data_path = self.datafile(filename)
 
@@ -1617,6 +1613,8 @@ class Workflow(object):
 
         with open(data_path, "rb") as file_obj:
             data = serializer.load(file_obj)
+
+        self.logger.debug("stored data loaded: %s", data_path)
 
         return data
 
@@ -1686,6 +1684,8 @@ class Workflow(object):
                 serializer.dump(data, file_obj)
 
         _store()
+
+        self.logger.debug("saved data: %s", data_path)
 
     def cached_data(self, name, data_func=None, max_age=60):
         """Return cached data if younger than ``max_age`` seconds.
