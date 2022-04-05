@@ -1267,7 +1267,7 @@ class Workflow(object):
         """Alfred 2's default cache directory."""
         return os.path.join(
             os.path.expanduser(
-                "~/Library/Caches/com.runningwithcrayons.Alfred-2/" "Workflow Data/"
+                "~/Library/Caches/com.runningwithcrayons.Alfred/" "Workflow Data/"
             ),
             self.bundleid,
         )
@@ -1605,8 +1605,6 @@ class Workflow(object):
                 "to load this data.".format(serializer_name)
             )
 
-        self.logger.debug("data `%s` stored as `%s`", name, serializer_name)
-
         filename = "{0}.{1}".format(name, serializer_name)
         data_path = self.datafile(filename)
 
@@ -1677,9 +1675,6 @@ class Workflow(object):
             delete_paths((metadata_path, data_path))
             return
 
-        if isinstance(data, str):
-            data = bytearray(data, encoding="utf-8")
-
         # Ensure write is not interrupted by SIGTERM
         @uninterruptible
         def _store():
@@ -1691,8 +1686,6 @@ class Workflow(object):
                 serializer.dump(data, file_obj)
 
         _store()
-
-        self.logger.debug("saved data: %s", data_path)
 
     def cached_data(self, name, data_func=None, max_age=60):
         """Return cached data if younger than ``max_age`` seconds.
