@@ -25,7 +25,12 @@ import json
 import logging
 import logging.handlers
 import os
-import pickle
+
+try:
+    import cPickle as pickle
+except:
+    import pickle
+
 import plistlib
 import re
 import shutil
@@ -688,6 +693,7 @@ class PickleSerializer(BaseSerializer):
 
 # Set up default manager and register built-in serializers
 manager = SerializerManager()
+manager.register("cpickle", PickleSerializer)
 manager.register("pickle", PickleSerializer)
 manager.register("json", JSONSerializer)
 
@@ -1614,8 +1620,6 @@ class Workflow(object):
         with open(data_path, "rb") as file_obj:
             data = serializer.load(file_obj)
 
-        self.logger.debug("stored data loaded: %s", data_path)
-
         return data
 
     def store_data(self, name, data, serializer=None):
@@ -1674,7 +1678,7 @@ class Workflow(object):
             return
 
         if isinstance(data, str):
-            data = bytearray(data)
+            data = bytearray(data, encoding="utf-8")
 
         # Ensure write is not interrupted by SIGTERM
         @uninterruptible

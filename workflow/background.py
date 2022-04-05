@@ -18,7 +18,12 @@ and examples.
 
 
 import os
-import pickle
+
+try:
+    import cPickle as pickle
+except:
+    import pickle
+
 import signal
 import subprocess
 import sys
